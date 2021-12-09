@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1085052050101",
+    "project_id": "dogarhouse-b97a0",
+    "storage_bucket": "dogarhouse-b97a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1085052050101:android:0e336f0e4322bd95b0fcfc",
+        "android_client_info": {
+          "package_name": "com.betterhostel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1085052050101-qvkum1q874sq9uk0hcvheeidm8ueb45f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.betterhostel",
+            "certificate_hash": "b65cac5432c5ec943a36c63f4a64be3647b6aab6"
+          }
+        },
+        {
+          "client_id": "1085052050101-a2ac0sa4doa71a8m2ujl6qmnbmtdls4t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsZyn6AqCo-FNYJof_T4sooXvAlKYCCII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1085052050101-a2ac0sa4doa71a8m2ujl6qmnbmtdls4t.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1085052050101-eee7gtratnpg5uq480lit4g9uvon9gfo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.betterHostel"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
