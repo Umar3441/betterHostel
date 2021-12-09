@@ -6,7 +6,7 @@ import { colors } from '../../utils'
 export default function Home() {
     return (
         <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: colors.primary }}>
-            <Text>Home</Text>
+            <Text>Home is here</Text>
             <Button title='touch' onPress={() => auth().signOut()} />
         </View>
     )
