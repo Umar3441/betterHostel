@@ -20,30 +20,25 @@ export default function TabNavigator() {
         <Tab.Navigator screenOptions={
             {
                 tabBarLabel: () => { return null },
+                headerShown: false,
 
                 tabBarStyle: {
-                    backgroundColor: colors.lightGrey,
-                    opacity: 0.5,
+
+                    // backgroundColsor: 'rgba(255, 255, 255, 0.5)',
+
                     position: 'absolute',
                     bottom: 30,
-                    // width: '90%',
+
                     alignSelf: 'center',
                     left: 20,
                     right: 20,
                     borderRadius: 20,
                     paddingBottom: 0,
                     height: 60,
-                    borderRadius: 20
-
-
-
+                    borderRadius: 20,
 
                 },
-                tabBarItemStyle: {
-                    // backgroundColor: 'yellow',
-                    padding: 0,
-                    marginVertical: 0,
-                }
+
 
 
 

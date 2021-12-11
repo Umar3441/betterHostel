@@ -4,6 +4,8 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 platform :ios, '11.0'
 
 pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+pod 'react-native-video', :path => '../node_modules/react-native-video/react-native-video.podspec'
+
 
 target 'betterHostel' do
   config = use_native_modules!
