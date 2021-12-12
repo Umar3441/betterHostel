@@ -68,7 +68,8 @@ export default function Post({ post }) {
                         source={{ uri: item?.url }}
                     /> :
                     <VideoPlayer
-                        // controls={false}
+                        disableSeek={true}
+
                         customStyles={
                             {
                                 playButton: {
@@ -100,7 +101,8 @@ export default function Post({ post }) {
                                     right: 10,
                                     left: 10
 
-                                }
+                                },
+
                             }
                         }
                         pauseOnPress
@@ -191,7 +193,7 @@ export default function Post({ post }) {
                 </View> : null}
 
                 <Carousel
-                    layoutCardOffset={100}
+                    // layoutCardOffset={100}
                     layout={'default'}
                     style={{ borderRadius: 20 }}
                     ref={snapCarouselRef}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native'
+import { Button, StyleSheet, Text, View, StatusBar, TouchableOpacity, FlatList } from 'react-native'
 import Image from 'react-native-fast-image'
 import auth from '@react-native-firebase/auth'
 import { colors } from '../../utils'
@@ -35,8 +35,25 @@ export default function Home() {
         <View style={{ flex: 1, backgroundColor: colors.white }}>
             <StatusBar translucent barStyle='light-content' backgroundColor='transparent' />
             <Header />
-            <View style={{ marginTop: 30 }}>
-                <Post post={posts[0]} />
+
+            <View style={{
+
+                zIndex: -1,
+
+
+            }}>
+                <FlatList
+
+                    style={styles.flatListStyles}
+                    data={posts}
+                    ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
+                    renderItem={({ item, index }) =>
+                        <View style={{ marginBottom: index === posts.length - 1 ? 300 : 0 }}>
+                            <Post post={item} />
+                        </View>
+                    }
+                    showsVerticalScrollIndicator={false}
+                />
             </View>
 
         </View>
@@ -87,4 +104,17 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 10
 
     },
+    flatListStyles: {
+
+        paddingTop: 20,
+
+
+    },
+    itemSeperator: {
+        width: '90%',
+        height: 0.5,
+        backgroundColor: colors.grey,
+        alignSelf: 'center',
+        marginVertical: 10
+    }
 })
