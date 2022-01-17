@@ -36,7 +36,20 @@ export default function AddPost() {
             console.log('---------------------->', image);
             const arr = []
             image.forEach(element => {
-                arr.push(element.path)
+
+                let type = 'image'
+
+                if (element.mime === 'image/jpeg' || element.mime === 'image/png') {
+                    type = 'image'
+                } else {
+                    type = 'video'
+                }
+
+                const media = {
+                    type: type,
+                    url: element.path
+                }
+                arr.push(media)
             });
             setimagesPicked([...imagesPicked, ...arr])
         });
@@ -66,14 +79,11 @@ export default function AddPost() {
         try {
 
             if (imagesPicked.length > 0) {
-
-
-
                 for (let index = 0; index < imagesPicked.length; index++) {
                     const element = imagesPicked[index];
 
                     const reference = storage().ref(`posts/${uuidv4()}`);
-                    const task = reference.putFile(element);
+                    const task = reference.putFile(element.url);
                     task.on('state_changed', taskSnapshot => {
                         console.log((taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100);
                     });
@@ -81,7 +91,10 @@ export default function AddPost() {
                     task.then(
                         async () => {
                             const url = await reference.getDownloadURL().catch((error) => { console.log('---', error) });
-                            postImages.push(url)
+                            postImages.push({
+                                type: element.type,
+                                url: url
+                            })
                             if (index === imagesPicked.length - 1) {
                                 firestore()
                                     .collection('posts')
@@ -194,7 +207,7 @@ export default function AddPost() {
                                 imagesPicked.map((image, index) => {
 
                                     return <TouchableOpacity key={index} onPress={() => deleteImage(image)}>
-                                        <Image source={{ uri: image }} style={styles.imagesPickerComponent} />
+                                        <Image source={{ uri: image.url }} style={styles.imagesPickerComponent} />
                                     </TouchableOpacity>
                                 }
                                 )
