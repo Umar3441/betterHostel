@@ -2,9 +2,9 @@ import React from 'react'
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { colors } from '../utils'
 
-const CustomButton = ({ title, onPress, loading }) => {
+const CustomButton = ({ title, onPress, loading, customStyles }) => {
     return (
-        <TouchableOpacity onPress={onPress} style={styles.container}>
+        <TouchableOpacity onPress={onPress} style={[styles.container, { ...customStyles }]}>
             {loading ?
                 <ActivityIndicator color={colors.white} />
                 : <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>

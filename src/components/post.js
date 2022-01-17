@@ -5,18 +5,23 @@ import Image from 'react-native-fast-image'
 import Entypo from 'react-native-vector-icons/Entypo'
 import ReadMore from 'react-native-read-more-text';
 import VideoPlayer from 'react-native-video-player';
-
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import numbro from 'numbro';
 import Carousel from 'react-native-snap-carousel';
 
 import { colors } from '../utils'
 
+
+import { Viewport } from '@skele/components'
+import moment from 'moment';
+
+const ViewportAwareVideo = Viewport.Aware(VideoPlayer)
+
 export default function Post({ post }) {
 
 
+    console.log('====>>>>>>>>>>', post)
 
-
-    const [loading, setLoading] = useState(false)
-    const videoRef = useRef(null)
     const [currentIndex, setcurrentIndex] = useState(1)
     const snapCarouselRef = useRef(null)
     const mediaRefs = useRef([])
@@ -24,36 +29,33 @@ export default function Post({ post }) {
 
 
 
-    const [media, setMedia] = useState(post.media.map((content) => {
+    const [media, setMedia] = useState(post?.media?.map((content) => {
         return {
             ...content,
             loading: false
         }
     }))
 
-
-
-
-
-
-
-
-
-
-
-
+    const fromDate = () => {
+        const span = moment(post.timeStamp).fromNow().toString().split(' ')[1];
+        // console.log(span)
+        if (span === 'years' || span === 'year' || span === 'months' || span === 'month') {
+            return moment(post.timeStamp).format('MM/DD/YYYY')
+        } else {
+            return moment(post.timeStamp).fromNow()
+        }
+    }
 
     const addToRef = (ref, index) => {
         mediaRefs.current[index] = ref
     }
 
     const renderSnapItem = (item, index) => {
+
         return (
-
             <>
-
                 {item?.loading ? <ActivityIndicator size='large'
-                    color={colors.primary}
+                    color={colors.white}
                     style={{
                         position: 'absolute',
                         top: '2%',
@@ -67,9 +69,11 @@ export default function Post({ post }) {
                         style={{ width: '100%', height: '100%', borderRadius: 20 }}
                         source={{ uri: item?.url }}
                     /> :
-                    <VideoPlayer
+                    <ViewportAwareVideo
+                        innerRef={(ref) => addToRef(ref, index)}
+                        // onViewportEnter={() => mediaRefs?.current[1]?.resume()}
+                        onViewportLeave={() => mediaRefs?.current[snapCarouselRef?.current?.currentIndex]?.pause()}
                         disableSeek={true}
-
                         customStyles={
                             {
                                 playButton: {
@@ -106,14 +110,12 @@ export default function Post({ post }) {
                             }
                         }
                         pauseOnPress
-                        ref={(ref) => addToRef(ref, index)}
                         video={{
                             uri: item?.url
                         }}
                         style={{ width: '100%', height: '100%', borderRadius: 20, }}
                         resizeMode='contain'
                         thumbnail={{ uri: item?.thumbnail }}
-
 
                         onLoadStart={() => setMedia(media.map((content, ind) => {
                             if (ind === index) {
@@ -156,7 +158,6 @@ export default function Post({ post }) {
                     <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden' }} >
                         <Image source={{ uri: post.profile_picture }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
                     </TouchableOpacity>
-
                     <View style={styles.nameContainer}>
                         <Text style={styles.nameText}>
                             {post.userName}
@@ -166,15 +167,9 @@ export default function Post({ post }) {
                         </Text>
                     </View>
                 </View>
-
-
-                <Entypo name='dots-three-horizontal' size={30} color={colors.grey} onPress={() => console.log('we are three dots in post header', mediaRefs.current)} />
-
+                <Entypo name='dots-three-horizontal' size={30} color={colors.grey} onPress={() => console.log('we are three dots in post header', snapCarouselRef.current.currentIndex)} />
             </View>
-
-
             <View style={styles.titleContainer}>
-
                 <ReadMore
 
                     numberOfLines={2}
@@ -188,12 +183,13 @@ export default function Post({ post }) {
 
             <View style={styles.mediaContainer}>
 
-                {media.length > 1 ? <View style={styles.indexContainer}>
+                {media?.length > 1 ? <View style={styles.indexContainer}>
                     <Text style={[styles.mediumGray, { color: 'white' }]}>{currentIndex} / {media.length}</Text>
                 </View> : null}
 
                 <Carousel
                     // layoutCardOffset={100}
+                    lockScrollWhileSnapping={true}
                     layout={'default'}
                     style={{ borderRadius: 20 }}
                     ref={snapCarouselRef}
@@ -213,6 +209,28 @@ export default function Post({ post }) {
 
             </View>
 
+            <View style={styles.reactionContainer}>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                    <MaterialCommunityIcons name='heart-outline' size={25} color={colors.grey} />
+                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{numbro(post.likes).format({
+                        spaceSeparated: false,
+                        // average: true,
+                        thousandSeparated: true,
+
+                    })}</Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 20 }}>
+                    <MaterialCommunityIcons name='comment-outline' size={22} color={colors.grey} />
+                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{post?.comments?.length}</Text>
+                </View>
+            </View>
+
+            <View style={{ marginHorizontal: 20 }}>
+                <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{fromDate()}</Text>
+            </View>
+
 
         </View>
     )
@@ -224,10 +242,6 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         backgroundColor: colors.white,
         borderRadius: 20,
-
-
-
-
     },
     postHeaderContainer: {
         width: '100%',
@@ -290,4 +304,11 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: colors.grey
     },
+    reactionContainer: {
+        flexDirection: 'row',
+        width: '100%',
+        // backgroundColor: 'red',
+        marginVertical: 5,
+        paddingHorizontal: 20,
+    }
 })

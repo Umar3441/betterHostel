@@ -1,15 +1,60 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Button, StyleSheet, Text, View, StatusBar, TouchableOpacity, FlatList } from 'react-native'
 import Image from 'react-native-fast-image'
 import auth from '@react-native-firebase/auth'
 import { colors } from '../../utils'
 import Post from '../../components/post'
-import { posts } from '../../data/posts'
+// import { posts } from '../../data/posts'
+import { Viewport } from '@skele/components'
+import firestore from '@react-native-firebase/firestore'
+
+import { useSelector, useDispatch } from 'react-redux'
+import { addPosts } from '../../redux/actions'
+
+
 
 
 
 
 export default function Home() {
+
+
+    // const [postsData, setPostsData] = useState(posts)
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const dispatch = useDispatch()
+
+    const user = useSelector(state => state.reducer.user)
+    const posts = useSelector(state => state.reducer.posts)
+
+    console.log('??????', posts)
+
+
+
+
+    useEffect(() => {
+
+
+        const subscribe = firestore()
+            .collection('posts')
+            .onSnapshot((querySnapshot) => {
+
+                const postsTemp = []
+                querySnapshot.forEach(function (doc) {
+                    console.log("snapshot added ", doc)
+                    postsTemp.push(doc.data())
+                });
+                dispatch(addPosts(postsTemp))
+            }
+            )
+
+        return subscribe
+
+    }
+
+        , [])
+
+
+
 
 
 
@@ -36,14 +81,15 @@ export default function Home() {
             <StatusBar translucent barStyle='light-content' backgroundColor='transparent' />
             <Header />
 
-            <View style={{
-
+            <Viewport.Tracker style={{
                 zIndex: -1,
-
-
             }}>
                 <FlatList
 
+                    // onViewableItemsChanged={onViewableItemsChanged.current}
+                    // viewabilityConfig={
+                    //     viewabilityConfig.current
+                    // }
                     style={styles.flatListStyles}
                     data={posts}
                     ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
@@ -54,7 +100,7 @@ export default function Home() {
                     }
                     showsVerticalScrollIndicator={false}
                 />
-            </View>
+            </Viewport.Tracker>
 
         </View>
     )
@@ -107,6 +153,7 @@ const styles = StyleSheet.create({
     flatListStyles: {
 
         paddingTop: 20,
+        zIndex: -5
 
 
     },

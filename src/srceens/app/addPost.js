@@ -1,15 +1,278 @@
-import React from 'react'
-import { Button, StyleSheet, Text, View } from 'react-native'
+import React, { useState, useRef, useEffect } from 'react'
+import { TouchableOpacity, StyleSheet, Text, TextInput, View, Image, ScrollView, Dimensions } from 'react-native'
 import auth from '@react-native-firebase/auth'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import Entypo from 'react-native-vector-icons/Entypo'
+import { colors } from '../../utils'
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+import ImagePicker from 'react-native-image-crop-picker';
+import CustomButton from '../../components/customButton';
+import storage from '@react-native-firebase/storage';
+import * as Progress from 'react-native-progress';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
+import firestore from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
+
+import moment from 'moment'
 
 
 export default function AddPost() {
+
+    const navigation = useNavigation()
+
+    const [title, setTitle] = useState(null)
+    const [imagesPicked, setimagesPicked] = useState([])
+    const scrollViewRef = useRef(null)
+    const [loading, setLoading] = useState(false)
+
+
+
+
+    const pickImage = () => {
+        ImagePicker.openPicker({
+            multiple: true,
+        }).then(image => {
+            console.log('---------------------->', image);
+            const arr = []
+            image.forEach(element => {
+                arr.push(element.path)
+            });
+            setimagesPicked([...imagesPicked, ...arr])
+        });
+
+
+    }
+
+
+    const deleteImage = (image) => {
+
+        setimagesPicked(imagesPicked.filter(item => item !== image))
+    }
+
+
+
+    const publishPost = async () => {
+
+
+        if (!title && imagesPicked.length < 1) {
+            alert('Add something to post')
+            return
+        }
+
+        const postImages = []
+        setLoading(true)
+
+        try {
+
+            if (imagesPicked.length > 0) {
+
+
+
+                for (let index = 0; index < imagesPicked.length; index++) {
+                    const element = imagesPicked[index];
+
+                    const reference = storage().ref(`posts/${uuidv4()}`);
+                    const task = reference.putFile(element);
+                    task.on('state_changed', taskSnapshot => {
+                        console.log((taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100);
+                    });
+
+                    task.then(
+                        async () => {
+                            const url = await reference.getDownloadURL().catch((error) => { console.log('---', error) });
+                            postImages.push(url)
+                            if (index === imagesPicked.length - 1) {
+                                firestore()
+                                    .collection('posts')
+                                    .add({
+                                        caption: title,
+                                        media: postImages,
+                                        user: auth().currentUser.uid,
+                                        userName: auth().currentUser.displayName,
+                                        profile_picture: auth().currentUser.photoURL,
+                                        userEmail: auth().currentUser.email,
+                                        comments: [],
+                                        timeStamp: moment().toISOString(),
+                                        likes: 0
+                                    })
+                                    .then(() => {
+                                        console.log('post added!');
+                                        setLoading(false)
+                                        setimagesPicked([])
+                                        setTitle(null)
+                                        navigation.goBack()
+                                    }).catch(
+                                        (error) => {
+                                            console.log(error)
+                                            setLoading(false)
+                                        }
+                                    );
+                            }
+                        }
+
+                    )
+
+                }
+            } else {
+
+
+                firestore()
+                    .collection('posts')
+                    .add({
+                        caption: title,
+                        media: postImages,
+                        user: auth().currentUser.uid,
+                        userName: auth().currentUser.displayName,
+                        profile_picture: auth().currentUser.photoURL,
+                        userEmail: auth().currentUser.email,
+                        comments: [],
+                        timeStamp: moment().toISOString(),
+                        likes: 0
+                    })
+                    .then(() => {
+                        console.log('post added!');
+                        setLoading(false)
+                        navigation.goBack()
+                    }).catch(
+                        (error) => {
+                            console.log(error)
+                            setLoading(false)
+                        }
+
+                    );
+            }
+
+
+        } catch (error) {
+            console.log('err', error)
+        }
+
+    }
+
+
+
+    useEffect(() => {
+        scrollViewRef.current.scrollToEnd()
+    }, [imagesPicked])
+
     return (
-        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-            <Text>Add Post</Text>
-            <Button title='touch' onPress={() => auth().signOut()} />
-        </View>
+        <ScrollView bounces={false} contentContainerStyle={{ flex: 1 }}>
+            <View style={styles.container}>
+                <View style={styles.headerContainer}>
+                    <AntDesign name='close' size={25} onPress={() => navigation.goBack()} />
+                    <Text style={styles.headingText} >
+                        Create Post
+                    </Text>
+                    <Text style={styles.nextText} onPress={() => publishPost()}>
+                        Next
+                    </Text>
+                </View>
+
+                <View style={styles.contentContainer}>
+
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: colors.grey, letterSpacing: 2, marginVertical: 5 }}>Title</Text>
+                    <View style={{ maxHeight: 400 }}>
+                        <TextInput
+                            value={title}
+                            onChangeText={(text) => setTitle(text)}
+                            style={{ marginHorizontal: 5, marginVertical: 5, marginBottom: 10 }}
+                            placeholder='write Something'
+                            multiline={true}
+
+                        />
+                    </View>
+
+                    <View
+                        horizontal={true}
+                        style={styles.imagesContainer}>
+                        <ScrollView
+                            ref={scrollViewRef}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}>
+                            {imagesPicked ?
+                                imagesPicked.map((image, index) => {
+
+                                    return <TouchableOpacity key={index} onPress={() => deleteImage(image)}>
+                                        <Image source={{ uri: image }} style={styles.imagesPickerComponent} />
+                                    </TouchableOpacity>
+                                }
+                                )
+                                : null
+                            }
+
+
+                            <TouchableOpacity
+                                onPress={pickImage}
+                                activeOpacity={0.7} style={styles.imagesPickerComponent}>
+                                <Entypo name='plus' size={80} color={'white'} />
+                            </TouchableOpacity>
+
+                        </ScrollView>
+
+                        <CustomButton title='Publish' onPress={() => publishPost()} customStyles={styles.publishButtonView} />
+
+                    </View>
+
+                </View>
+
+            </View>
+
+            {loading ?
+                <View style={{ alignSelf: 'center', position: 'absolute', top: '50%' }}>
+                    <Progress.Bar width={Dimensions.get('screen').width - 50} color={colors.primary} animated indeterminate />
+                </View>
+                : null}
+
+        </ScrollView>
     )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'white'
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        marginTop: getStatusBarHeight(),
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+        alignItems: 'center'
+    },
+    headingText: {
+        fontSize: 17,
+        fontWeight: 'bold'
+    },
+    nextText: {
+        fontSize: 17,
+        fontWeight: '500',
+        color: colors.primary,
+
+    },
+    contentContainer: {
+        flex: 1,
+        // backgroundColor: 'red',
+        marginTop: 20,
+        paddingHorizontal: 20
+    },
+    imagesContainer: {
+        width: '100%',
+        marginBottom: 10
+
+        // backgroundColor: 'red'
+    },
+    imagesPickerComponent: {
+        width: 110,
+        height: 110,
+        borderRadius: 10,
+        backgroundColor: 'lightgrey',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 5
+    },
+    publishButtonView: {
+        width: '100%',
+        marginTop: 20
+    }
+})
