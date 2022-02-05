@@ -13,6 +13,8 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux'
+import { addPosts } from '../../redux/actions'
 
 import moment from 'moment'
 
@@ -25,6 +27,9 @@ export default function AddPost() {
     const [imagesPicked, setimagesPicked] = useState([])
     const scrollViewRef = useRef(null)
     const [loading, setLoading] = useState(false)
+
+    const posts = useSelector(state => state.reducer.posts)
+    const dispatch = useDispatch()
 
 
 
@@ -39,7 +44,9 @@ export default function AddPost() {
 
                 let type = 'image'
 
-                if (element.mime === 'image/jpeg' || element.mime === 'image/png') {
+                console.log('type ----------->', element.mime)
+
+                if (element.mime.includes('image')) {
                     type = 'image'
                 } else {
                     type = 'video'
@@ -85,17 +92,19 @@ export default function AddPost() {
                     const reference = storage().ref(`posts/${uuidv4()}`);
                     const task = reference.putFile(element.url);
                     task.on('state_changed', taskSnapshot => {
-                        console.log((taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100);
+                        // console.log((taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100);
                     });
 
                     task.then(
                         async () => {
                             const url = await reference.getDownloadURL().catch((error) => { console.log('---', error) });
+                            console.log('------------->', url)
                             postImages.push({
                                 type: element.type,
                                 url: url
                             })
-                            if (index === imagesPicked.length - 1) {
+                            // if (index === imagesPicked.length - 1) {
+                            if (postImages.length === imagesPicked.length) {
                                 firestore()
                                     .collection('posts')
                                     .add({
@@ -110,6 +119,37 @@ export default function AddPost() {
                                         likes: 0
                                     })
                                     .then(() => {
+
+
+                                        const tempPosts = [
+                                            {
+                                                caption: title,
+                                                media: postImages,
+                                                user: auth().currentUser.uid,
+                                                userName: auth().currentUser.displayName,
+                                                profile_picture: auth().currentUser.photoURL,
+                                                userEmail: auth().currentUser.email,
+                                                comments: [],
+                                                timeStamp: moment().toISOString(),
+                                                likes: 0
+                                            }
+
+                                            , ...posts]
+                                        // tempPosts.push({
+                                        //     caption: title,
+                                        //     media: postImages,
+                                        //     user: auth().currentUser.uid,
+                                        //     userName: auth().currentUser.displayName,
+                                        //     profile_picture: auth().currentUser.photoURL,
+                                        //     userEmail: auth().currentUser.email,
+                                        //     comments: [],
+                                        //     timeStamp: moment().toISOString(),
+                                        //     likes: 0
+                                        // })
+
+                                        dispatch(addPosts(tempPosts))
+
+
                                         console.log('post added!');
                                         setLoading(false)
                                         setimagesPicked([])
