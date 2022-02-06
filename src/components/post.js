@@ -29,12 +29,21 @@ export default function Post({ post }) {
 
 
 
-    const [media, setMedia] = useState(post?.media?.map((content) => {
-        return {
-            ...content,
-            loading: false
-        }
-    }))
+    const [media, setMedia] = useState([])
+
+
+
+    useEffect(() => {
+        setMedia(post?.media?.map((content) => {
+            return {
+                ...content,
+                loading: false
+            }
+        }))
+
+
+    }, [post]);
+
 
     const fromDate = () => {
         const span = moment(post.timeStamp).fromNow().toString().split(' ')[1];
@@ -212,7 +221,7 @@ export default function Post({ post }) {
             <View style={styles.reactionContainer}>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                    <MaterialCommunityIcons name='heart-outline' size={25} color={colors.grey} />
+                    <MaterialCommunityIcons name='heart-outline' size={25} color={colors.grey} onPress={() => console.log('like')} />
                     <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{numbro(post.likes).format({
                         spaceSeparated: false,
                         // average: true,

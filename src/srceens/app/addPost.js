@@ -121,33 +121,33 @@ export default function AddPost() {
                                     .then(() => {
 
 
-                                        const tempPosts = [
-                                            {
-                                                caption: title,
-                                                media: postImages,
-                                                user: auth().currentUser.uid,
-                                                userName: auth().currentUser.displayName,
-                                                profile_picture: auth().currentUser.photoURL,
-                                                userEmail: auth().currentUser.email,
-                                                comments: [],
-                                                timeStamp: moment().toISOString(),
-                                                likes: 0
-                                            }
+                                        // const tempPosts = [
+                                        //     {
+                                        //         caption: title,
+                                        //         media: postImages,
+                                        //         user: auth().currentUser.uid,
+                                        //         userName: auth().currentUser.displayName,
+                                        //         profile_picture: auth().currentUser.photoURL,
+                                        //         userEmail: auth().currentUser.email,
+                                        //         comments: [],
+                                        //         timeStamp: moment().toISOString(),
+                                        //         likes: 0
+                                        //     }
 
-                                            , ...posts]
-                                        // tempPosts.push({
-                                        //     caption: title,
-                                        //     media: postImages,
-                                        //     user: auth().currentUser.uid,
-                                        //     userName: auth().currentUser.displayName,
-                                        //     profile_picture: auth().currentUser.photoURL,
-                                        //     userEmail: auth().currentUser.email,
-                                        //     comments: [],
-                                        //     timeStamp: moment().toISOString(),
-                                        //     likes: 0
-                                        // })
+                                        //     , ...posts]
+                                        // // tempPosts.push({
+                                        // //     caption: title,
+                                        // //     media: postImages,
+                                        // //     user: auth().currentUser.uid,
+                                        // //     userName: auth().currentUser.displayName,
+                                        // //     profile_picture: auth().currentUser.photoURL,
+                                        // //     userEmail: auth().currentUser.email,
+                                        // //     comments: [],
+                                        // //     timeStamp: moment().toISOString(),
+                                        // //     likes: 0
+                                        // // })
 
-                                        dispatch(addPosts(tempPosts))
+                                        // dispatch(addPosts(tempPosts))
 
 
                                         console.log('post added!');
