@@ -64,7 +64,7 @@ export default function Post({ post }) {
 
     const checkLiked = () => {
         let liked = false;
-        post.likes.map(like => {
+        post?.likes?.map(like => {
             if (like === userId) {
                 liked = true
 
@@ -248,7 +248,7 @@ export default function Post({ post }) {
 
     return (
         <View style={[styles.container,]}>
-            <StatusBar translucent barStyle={statusBarContent} backgroundColor='transparent' />
+            {/* <StatusBar translucent barStyle={statusBarContent} backgroundColor='transparent' /> */}
             <View style={styles.postHeaderContainer}>
                 <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden' }} >
@@ -263,7 +263,7 @@ export default function Post({ post }) {
                         </Text>
                     </View>
                 </View>
-                <Entypo name='dots-three-horizontal' size={30} color={colors.grey} onPress={() => console.log('we are three dots in post header', snapCarouselRef.current.currentIndex)} />
+                {/* <Entypo name='dots-three-horizontal' size={30} color={colors.grey} onPress={() => console.log('we are three dots in post header', snapCarouselRef.current.currentIndex)} /> */}
             </View>
             <View style={styles.titleContainer}>
                 <ReadMore
@@ -277,33 +277,34 @@ export default function Post({ post }) {
 
             </View>
 
-            <View style={styles.mediaContainer}>
+            {media?.length > 0 ?
+                <View style={styles.mediaContainer}>
 
-                {media?.length > 1 ? <View style={styles.indexContainer}>
-                    <Text style={[styles.mediumGray, { color: 'white' }]}>{currentIndex} / {media.length}</Text>
+                    {media?.length > 1 ? <View style={styles.indexContainer}>
+                        <Text style={[styles.mediumGray, { color: 'white' }]}>{currentIndex} / {media.length}</Text>
+                    </View> : null}
+
+                    <Carousel
+                        // layoutCardOffset={100}
+                        lockScrollWhileSnapping={true}
+                        layout={'default'}
+                        style={{ borderRadius: 20 }}
+                        ref={snapCarouselRef}
+                        data={media}
+                        onSnapToItem={(item) => {
+                            setcurrentIndex(item + 1)
+                            mediaRefs?.current[item - 1]?.pause()
+                            mediaRefs?.current[item + 1]?.pause()
+
+
+                        }}
+                        renderItem={({ item, index }) => renderSnapItem(item, index)}
+                        sliderWidth={Dimensions.get('screen').width}
+                        itemWidth={Dimensions.get('screen').width - 10}
+                    />
+
+
                 </View> : null}
-
-                <Carousel
-                    // layoutCardOffset={100}
-                    lockScrollWhileSnapping={true}
-                    layout={'default'}
-                    style={{ borderRadius: 20 }}
-                    ref={snapCarouselRef}
-                    data={media}
-                    onSnapToItem={(item) => {
-                        setcurrentIndex(item + 1)
-                        mediaRefs?.current[item - 1]?.pause()
-                        mediaRefs?.current[item + 1]?.pause()
-
-
-                    }}
-                    renderItem={({ item, index }) => renderSnapItem(item, index)}
-                    sliderWidth={Dimensions.get('screen').width}
-                    itemWidth={Dimensions.get('screen').width - 10}
-                />
-
-
-            </View>
 
             <View style={styles.reactionContainer}>
 
@@ -336,9 +337,11 @@ export default function Post({ post }) {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={styles.commentsContainer}>
 
-                    <MaterialCommunityIcons name='close' size={30} onPress={() => setShowCommentsModal(false)} style={{ position: 'absolute', top: getStatusBarHeight(), right: 20 }} />
+                    <MaterialCommunityIcons name='close' size={30} onPress={() => setShowCommentsModal(false)} style={{ position: 'absolute', top: 10, right: 20 }} />
 
-                    <Text style={{ fontSize: 22, fontWeight: 'bold', alignSelf: 'center', color: colors.black, marginBottom: 10 }}>Comments</Text>
+                    <View style={{ width: 30, height: 10, backgroundColor: colors.grey, alignSelf: 'center', borderRadius: 20 }} />
+
+                    <Text style={{ fontSize: 22, fontWeight: 'bold', alignSelf: 'center', color: colors.black, marginVertical: 5 }}>Comments</Text>
 
                     <ScrollView showsVerticalScrollIndicator={false}>
 
@@ -468,12 +471,17 @@ const styles = StyleSheet.create({
         width: Dimensions.get('screen').width,
         alignSelf: 'center',
         marginVertical: 0,
+        marginTop: getStatusBarHeight(),
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        overflow: 'hidden',
+
 
 
     },
     commentsContainer: {
         flex: 1,
-        paddingTop: getStatusBarHeight(),
+        paddingTop: 10,
         backgroundColor: colors.white,
         justifyContent: 'space-between',
 

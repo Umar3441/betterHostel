@@ -9,6 +9,8 @@ import Suggestions from '../srceens/app/suggestions';
 import Complaints from '../srceens/app/complaints';
 import AddPost from '../srceens/app/addPost';
 import Account from '../srceens/app/Account';
+import AddSuggestion from '../srceens/app/addSuggestion';
+import AddComplaint from '../srceens/app/addComplaint';
 
 
 const Stack = createNativeStackNavigator()
@@ -16,12 +18,17 @@ const Stack = createNativeStackNavigator()
 const AppNavigator = () => {
     return (
         <NavigationContainer>
-            <Stack.Navigator>
+            <Stack.Navigator screenOptions={
+                {
+                    headerShown: false
+                }
+            }>
                 <Stack.Screen name='TabNavigator' component={TabNavigator} />
-                <Stack.Screen name='Suggestions' component={Suggestions} />
-                <Stack.Screen name='Complaints' component={Complaints} />
+                <Stack.Screen name='AddSuggestion' component={AddSuggestion} />
+                <Stack.Screen name='AddComplaint' component={AddComplaint} />
                 <Stack.Screen name='AddPost' component={AddPost} />
-                <Stack.Screen name='Account' component={Account} />
+
+
             </Stack.Navigator>
         </NavigationContainer>
     )

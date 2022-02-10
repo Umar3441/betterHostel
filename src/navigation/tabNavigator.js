@@ -15,11 +15,13 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { colors } from '../utils';
 
+
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
 
     const navigation = useNavigation()
+
     const [optionalPostModal, setOptionalPostModal] = useState(false)
 
     return (
@@ -74,7 +76,7 @@ export default function TabNavigator() {
                         }
                     }
                 />
-                <Tab.Screen name="AddPost" component={AddPost}
+                <Tab.Screen name="Add" component={Dummy}
                     options={
                         {
                             tabBarIcon: ({ focused }) => <AntDesign name='plussquareo' size={30} color={focused ? colors.primary : colors.grey} />
@@ -122,7 +124,7 @@ export default function TabNavigator() {
                 <View style={styles.containerView}>
                     <TouchableOpacity onPress={() => {
                         setOptionalPostModal(false)
-                        navigation.navigate('Suggestions')
+                        navigation.navigate('AddSuggestion')
                     }} style={styles.buttonBox}>
                         <MaterialCommunityIcons name='lightbulb-on-outline' size={60} color={colors.primary} />
                         <Text style={styles.optionText}>Suggest</Text>
@@ -136,7 +138,7 @@ export default function TabNavigator() {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {
                         setOptionalPostModal(false)
-                        navigation.navigate('Complaints')
+                        navigation.navigate('AddComplaint')
                     }} style={styles.buttonBox}>
                         <MaterialIcons name='error-outline' size={60} color={colors.primary} />
                         <Text style={styles.optionText}>Complaint</Text>
@@ -147,6 +149,12 @@ export default function TabNavigator() {
     );
 }
 
+
+const Dummy = () => {
+    return (
+        <View></View>
+    )
+}
 
 const styles = StyleSheet.create(
     {

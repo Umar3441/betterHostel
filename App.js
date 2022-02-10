@@ -4,6 +4,7 @@ import auth from '@react-native-firebase/auth';
 import Home from './src/srceens/app/home';
 import TabNavigator from './src/navigation/tabNavigator';
 import { NavigationContainer } from '@react-navigation/native';
+import AppNavigator from './src/navigation/appNavigator';
 
 export default function App() {
   const [initializing, setInitializing] = useState(true);
@@ -29,10 +30,14 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <TabNavigator />
-    </NavigationContainer>
-  );
+    <AppNavigator />
+  )
+
+  // return (
+  //   <NavigationContainer>
+  //     <TabNavigator />
+  //   </NavigationContainer>
+  // );
 }
 
 
