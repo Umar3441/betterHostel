@@ -1,19 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Dimensions, StatusBar, KeyboardAvoidingView, TextInput, ScrollView, Keyboard } from 'react-native'
 
 import Image from 'react-native-fast-image'
 import Entypo from 'react-native-vector-icons/Entypo'
 import ReadMore from 'react-native-read-more-text';
 import VideoPlayer from 'react-native-video-player';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import numbro from 'numbro';
 import Carousel from 'react-native-snap-carousel';
-
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { colors } from '../utils'
+import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
+
+
 
 
 import { Viewport } from '@skele/components'
 import moment from 'moment';
+import Modal from 'react-native-modal';
 
 const ViewportAwareVideo = Viewport.Aware(VideoPlayer)
 
@@ -26,12 +32,22 @@ export default function Post({ post }) {
     const snapCarouselRef = useRef(null)
     const mediaRefs = useRef([])
     mediaRefs.current = []
+    const userId = auth().currentUser.uid;
+    const postId = post.id;
+    const [commentText, setCommentText] = useState();
+    const [showCommentsModal, setShowCommentsModal] = useState(false);
 
 
 
     const [media, setMedia] = useState([])
+    const [liked, setLiked] = useState(false);
 
 
+    const [statusBarContent, setstatusBarContent] = useState('dark-content');
+
+
+
+    const comments = post.comments
 
     useEffect(() => {
         setMedia(post?.media?.map((content) => {
@@ -41,8 +57,78 @@ export default function Post({ post }) {
             }
         }))
 
-
+        checkLiked()
     }, [post]);
+
+
+
+    const checkLiked = () => {
+        let liked = false;
+        post.likes.map(like => {
+            if (like === userId) {
+                liked = true
+
+            }
+        })
+        setLiked(liked)
+    }
+
+
+    const like = () => {
+        console.log('liking', postId, '--->', userId)
+
+
+        if (!liked) {
+            firestore().collection('posts').doc(postId).update(
+                {
+                    likes: [...post.likes, userId],
+                }
+            )
+        } else {
+            const likes = post.likes.filter(like => like !== userId)
+
+            console.log('------>', likes)
+
+            firestore().collection('posts').doc(postId).update(
+                {
+                    likes: likes,
+                }
+            )
+        }
+    }
+
+
+    const addComment = () => {
+
+
+        if (!commentText) {
+            return
+        }
+
+
+        firestore().collection('posts').doc(postId).update(
+            {
+                comments: [
+                    ...post.comments
+                    ,
+                    {
+                        userId: auth()?.currentUser?.uid,
+                        userName: auth()?.currentUser?.displayName,
+                        userAvatar: auth().currentUser.photoURL,
+                        comment: commentText,
+                        timeStamp: moment().toISOString(),
+                    }
+                ]
+            }
+        ).then(
+            () => {
+
+                // Keyboard.dismiss()
+                setCommentText(null)
+            }
+        )
+
+    }
 
 
     const fromDate = () => {
@@ -162,6 +248,7 @@ export default function Post({ post }) {
 
     return (
         <View style={[styles.container,]}>
+            <StatusBar translucent barStyle={statusBarContent} backgroundColor='transparent' />
             <View style={styles.postHeaderContainer}>
                 <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden' }} >
@@ -221,17 +308,15 @@ export default function Post({ post }) {
             <View style={styles.reactionContainer}>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                    <MaterialCommunityIcons name='heart-outline' size={25} color={colors.grey} onPress={() => console.log('like')} />
-                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{numbro(post.likes).format({
-                        spaceSeparated: false,
-                        // average: true,
-                        thousandSeparated: true,
 
-                    })}</Text>
+                    {liked ?
+                        <MaterialCommunityIcons name='heart' size={25} color={colors.red} onPress={() => like()} />
+                        : <MaterialCommunityIcons name='heart-outline' size={25} color={colors.grey} onPress={() => like()} />}
+                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{post?.likes?.length}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 20 }}>
-                    <MaterialCommunityIcons name='comment-outline' size={22} color={colors.grey} />
+                    <MaterialCommunityIcons name='comment-outline' size={22} color={colors.grey} onPress={() => setShowCommentsModal(true)} />
                     <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{post?.comments?.length}</Text>
                 </View>
             </View>
@@ -240,6 +325,62 @@ export default function Post({ post }) {
                 <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{fromDate()}</Text>
             </View>
 
+            <Modal
+                animationType={"slide"}
+                visible={showCommentsModal}
+                style={styles.commentsModal}
+
+            >
+
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={styles.commentsContainer}>
+
+                    <MaterialCommunityIcons name='close' size={30} onPress={() => setShowCommentsModal(false)} style={{ position: 'absolute', top: getStatusBarHeight(), right: 20 }} />
+
+                    <Text style={{ fontSize: 22, fontWeight: 'bold', alignSelf: 'center', color: colors.black, marginBottom: 10 }}>Comments</Text>
+
+                    <ScrollView showsVerticalScrollIndicator={false}>
+
+
+                        {
+                            comments.map((comment, index) => <CommentBody key={index} comment={comment} />)
+                        }
+                    </ScrollView>
+                    <View style={styles.commentInput}>
+                        <TextInput placeholder='Comment' value={commentText} onChangeText={(text) => setCommentText(text)} multiline={true} style={{ backgroundColor: colors.lightGrey, flex: 7, padding: 10, paddingTop: 10, borderRadius: 10, alignItems: 'center' }} />
+                        <View style={{ flex: 1, marginHorizontal: 5 }}>
+                            <FontAwesome name='send' size={30} color={colors.primary} onPress={() => addComment()} />
+                        </View>
+
+
+                    </View>
+                </KeyboardAvoidingView>
+
+            </Modal>
+
+        </View>
+    )
+}
+
+
+
+const CommentBody = ({ comment }) => {
+    return (
+        <View style={styles.commentContentContainer}>
+
+            <View style={styles.userAvatar}>
+                <Image source={{ uri: comment.userAvatar }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
+            </View>
+
+            <View style={{ flexDirection: 'row', width: '90%', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 5 }}>
+                <Text style={{ color: colors.grey, fontWeight: 'bold', fontSize: 18 }}>{comment.userName}</Text>
+                <Text style={{ color: colors.grey }}>{moment(comment.timeStamp).fromNow(true)}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', width: '90%', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 5, marginTop: 10 }}>
+                <Text style={{ textAlign: 'justify' }}>{comment.comment} </Text>
+            </View>
 
         </View>
     )
@@ -319,5 +460,75 @@ const styles = StyleSheet.create({
         // backgroundColor: 'red',
         marginVertical: 5,
         paddingHorizontal: 20,
+    },
+
+    commentsModal: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        width: Dimensions.get('screen').width,
+        alignSelf: 'center',
+        marginVertical: 0,
+
+
+    },
+    commentsContainer: {
+        flex: 1,
+        paddingTop: getStatusBarHeight(),
+        backgroundColor: colors.white,
+        justifyContent: 'space-between',
+
+
+
+    },
+    commentContentContainer:
+    {
+        width: Dimensions.get('screen').width - 35,
+        // height: 140,
+        paddingVertical: 20,
+        paddingLeft: 40,
+        marginVertical: 10,
+        backgroundColor: colors.white,
+        borderRadius: 20,
+        // borderColor: colors.primary,
+        // borderWidth: 1,
+        marginLeft: 25,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.29,
+        shadowRadius: 4.65,
+
+        elevation: 7,
+    },
+    userAvatar: {
+        backgroundColor: colors.white,
+        width: 55,
+        height: 55,
+        borderRadius: 10,
+        position: 'absolute',
+        top: 15,
+        left: -20,
+        overflow: 'hidden',
+        borderColor: colors.grey,
+        borderWidth: 1,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        },
+        shadowOpacity: 0.39,
+        shadowRadius: 8.30,
+
+        elevation: 13,
+    },
+    commentInput:
+    {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        marginHorizontal: 20
     }
 })

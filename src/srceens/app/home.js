@@ -64,7 +64,7 @@ export default function Home() {
 
                 const postsTemp = []
                 setposts(querySnapshot.docs.map(function (doc) {
-                    return doc.data()
+                    return { id: doc.id, ...doc.data() }
                     // postsTemp.push(doc.data())
                 }))
 

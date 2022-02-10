@@ -116,7 +116,7 @@ export default function AddPost() {
                                         userEmail: auth().currentUser.email,
                                         comments: [],
                                         timeStamp: moment().toISOString(),
-                                        likes: 0
+                                        likes: []
                                     })
                                     .then(() => {
 
