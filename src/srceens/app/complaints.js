@@ -30,6 +30,10 @@ export default function Complaints() {
         <View style={{ flex: 1, backgroundColor: colors.white }}>
             <StatusBar translucent barStyle='light-content' backgroundColor='transparent' />
             <Header />
+
+
+
+
         </View>
     )
 }

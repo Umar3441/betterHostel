@@ -38,13 +38,13 @@ export default function AddPost() {
         ImagePicker.openPicker({
             multiple: true,
         }).then(image => {
-            console.log('---------------------->', image);
+            // console.log('---------------------->', image);
             const arr = []
             image.forEach(element => {
 
                 let type = 'image'
 
-                console.log('type ----------->', element.mime)
+                // console.log('type ----------->', element.mime)
 
                 if (element.mime.includes('image')) {
                     type = 'image'
@@ -98,7 +98,7 @@ export default function AddPost() {
                     task.then(
                         async () => {
                             const url = await reference.getDownloadURL().catch((error) => { console.log('---', error) });
-                            console.log('------------->', url)
+                            // console.log('------------->', url)
                             postImages.push({
                                 type: element.type,
                                 url: url
@@ -150,7 +150,7 @@ export default function AddPost() {
                                         // dispatch(addPosts(tempPosts))
 
 
-                                        console.log('post added!');
+                                        // console.log('post added!');
                                         setLoading(false)
                                         setimagesPicked([])
                                         setTitle(null)

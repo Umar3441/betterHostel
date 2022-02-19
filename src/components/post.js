@@ -26,7 +26,7 @@ const ViewportAwareVideo = Viewport.Aware(VideoPlayer)
 export default function Post({ post }) {
 
 
-    console.log('====>>>>>>>>>>', post)
+    // console.log('====>>>>>>>>>>', post)
 
     const [currentIndex, setcurrentIndex] = useState(1)
     const snapCarouselRef = useRef(null)
@@ -37,6 +37,7 @@ export default function Post({ post }) {
     const [commentText, setCommentText] = useState();
     const [showCommentsModal, setShowCommentsModal] = useState(false);
 
+    const commentsScrollViewRef = useRef(null)
 
 
     const [media, setMedia] = useState([])
@@ -75,7 +76,7 @@ export default function Post({ post }) {
 
 
     const like = () => {
-        console.log('liking', postId, '--->', userId)
+        // console.log('liking', postId, '--->', userId)
 
 
         if (!liked) {
@@ -87,7 +88,7 @@ export default function Post({ post }) {
         } else {
             const likes = post.likes.filter(like => like !== userId)
 
-            console.log('------>', likes)
+            // console.log('------>', likes)
 
             firestore().collection('posts').doc(postId).update(
                 {
@@ -124,6 +125,7 @@ export default function Post({ post }) {
             () => {
 
                 // Keyboard.dismiss()
+                commentsScrollViewRef.current.scrollToEnd()
                 setCommentText(null)
             }
         )
@@ -252,7 +254,7 @@ export default function Post({ post }) {
             <View style={styles.postHeaderContainer}>
                 <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden' }} >
-                        <Image source={{ uri: post.profile_picture }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                        <Image source={{ uri: 'https://source.unsplash.com/1024x768/?man' }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
                     </TouchableOpacity>
                     <View style={styles.nameContainer}>
                         <Text style={styles.nameText}>
@@ -278,6 +280,7 @@ export default function Post({ post }) {
             </View>
 
             {media?.length > 0 ?
+
                 <View style={styles.mediaContainer}>
 
                     {media?.length > 1 ? <View style={styles.indexContainer}>
@@ -304,7 +307,9 @@ export default function Post({ post }) {
                     />
 
 
-                </View> : null}
+                </View>
+                : null}
+
 
             <View style={styles.reactionContainer}>
 
@@ -337,13 +342,16 @@ export default function Post({ post }) {
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={styles.commentsContainer}>
 
-                    <MaterialCommunityIcons name='close' size={30} onPress={() => setShowCommentsModal(false)} style={{ position: 'absolute', top: 10, right: 20 }} />
+                    <MaterialCommunityIcons name='close' color={colors.primary} size={30} onPress={() => setShowCommentsModal(false)} style={{ position: 'absolute', top: 10, right: 20 }} />
 
-                    <View style={{ width: 30, height: 10, backgroundColor: colors.grey, alignSelf: 'center', borderRadius: 20 }} />
+                    <View style={{ width: 30, height: 10, backgroundColor: colors.primary, alignSelf: 'center', borderRadius: 20 }} />
 
                     <Text style={{ fontSize: 22, fontWeight: 'bold', alignSelf: 'center', color: colors.black, marginVertical: 5 }}>Comments</Text>
 
-                    <ScrollView showsVerticalScrollIndicator={false}>
+                    <ScrollView
+
+                        ref={commentsScrollViewRef}
+                        showsVerticalScrollIndicator={false}>
 
 
                         {
@@ -467,11 +475,11 @@ const styles = StyleSheet.create({
 
     commentsModal: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        // backgroundColor: 'rgba(0,0,0,0.5)',
         width: Dimensions.get('screen').width,
         alignSelf: 'center',
         marginVertical: 0,
-        marginTop: getStatusBarHeight(),
+        paddingTop: getStatusBarHeight(),
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         overflow: 'hidden',
@@ -484,6 +492,8 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         backgroundColor: colors.white,
         justifyContent: 'space-between',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
 
 
 

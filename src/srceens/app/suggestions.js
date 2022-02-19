@@ -1,24 +1,36 @@
-import React from 'react'
-import { TouchableOpacity, StyleSheet, Text, View, StatusBar } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { TouchableOpacity, StyleSheet, FlatList, Text, View, StatusBar, ScrollView } from 'react-native'
 import auth from '@react-native-firebase/auth'
 import { colors } from '../../utils'
 import Image from 'react-native-fast-image'
+import Suggestion from '../../components/suggestion'
+import firestore from '@react-native-firebase/firestore'
 
 
 export default function Suggestions() {
 
+    const [suggestions, setSuggestions] = useState([])
 
+    useEffect(() => {
+        const subscribe = firestore()
+            .collection('suggestions')
+            .orderBy('timeStamp', "desc")
+            .onSnapshot((querySnapshot) => {
+                const postsTemp = []
+                setSuggestions(querySnapshot.docs.map(function (doc) {
+                    return { id: doc.id, ...doc.data() }
+                    // postsTemp.push(doc.data())
+                }))
 
-    const suggestions = [
-        {
-            userName: 'Umar',
-            userEmail: 'mrumar3441@gmail.com',
-            profile_picture: 'https://firebasestorage.googleapis.com:443/v0/b/dogarhouse-b97a0.appspot.com/o/posts%2Ff24333fc-f1fc-4bfb-a931-f3aee8e43f3c?alt=media&token=2ed00ef1-b40f-4a2f-9251-992c98ddffbc',
-            isAnonymous: false,
-            suggestion: 'There should be a copy of documents for each student'
-        }
-    ]
+                // dispatch(addPosts(postsTemp))
+            }
+            )
 
+        return subscribe
+
+    }
+
+        , [])
 
     const Header = () => {
 
@@ -41,6 +53,22 @@ export default function Suggestions() {
         <View style={{ flex: 1, backgroundColor: colors.white }}>
             <StatusBar translucent barStyle='light-content' backgroundColor='transparent' />
             <Header />
+            <FlatList
+
+                // onViewableItemsChanged={onViewableItemsChanged.current}
+                // viewabilityConfig={
+                //     viewabilityConfig.current
+                // }
+                style={styles.flatListStyles}
+                data={suggestions}
+                ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
+                renderItem={({ item, index }) =>
+                    <View style={{ marginBottom: index === suggestions.length - 1 ? 300 : 0 }}>
+                        <Suggestion suggestion={item} />
+                    </View>
+                }
+                showsVerticalScrollIndicator={false}
+            />
         </View>
     )
 }
@@ -89,4 +117,18 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 10
 
     },
+    flatListStyles: {
+
+        paddingTop: 20,
+        zIndex: -5
+
+
+    },
+    itemSeperator: {
+        width: '90%',
+        height: 0.5,
+        backgroundColor: colors.grey,
+        alignSelf: 'center',
+        marginVertical: 10
+    }
 })

@@ -28,7 +28,7 @@ export default function Home() {
 
     const [posts, setposts] = useState([]);
 
-    console.log('??????', posts)
+    // console.log('??????', posts)
 
 
 
@@ -61,7 +61,6 @@ export default function Home() {
             .collection('posts')
             .orderBy('timeStamp', "desc")
             .onSnapshot((querySnapshot) => {
-
                 const postsTemp = []
                 setposts(querySnapshot.docs.map(function (doc) {
                     return { id: doc.id, ...doc.data() }
