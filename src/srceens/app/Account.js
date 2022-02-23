@@ -84,29 +84,29 @@ export default function Account() {
             <StatusBar translucent barStyle='light-content' backgroundColor='transparent' />
             <Header />
 
-            {posts.length > 0 ?
-                <Viewport.Tracker style={{
-                    zIndex: -1,
-                }}>
-                    <FlatList
+            {/* {posts.length > 0 ? */}
+            <Viewport.Tracker style={{
+                zIndex: -1,
+            }}>
+                <FlatList
 
-                        style={styles.flatListStyles}
-                        data={posts}
-                        ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
-                        renderItem={({ item, index }) =>
-                            <View style={{ marginBottom: index === posts.length - 1 ? 300 : 0 }}>
-                                <Post post={item} />
-                            </View>
-                        }
-                        showsVerticalScrollIndicator={false}
-                        ListHeaderComponent={() => <ProfileHeader />}
-                    />
-                </Viewport.Tracker>
-                :
+                    style={styles.flatListStyles}
+                    data={posts}
+                    ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
+                    renderItem={({ item, index }) =>
+                        <View style={{ marginBottom: index === posts.length - 1 ? 300 : 0 }}>
+                            <Post post={item} />
+                        </View>
+                    }
+                    showsVerticalScrollIndicator={false}
+                    ListHeaderComponent={() => <ProfileHeader />}
+                />
+            </Viewport.Tracker>
+            {/* :
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <Text style={{ color: colors.grey, fontSize: 18 }}>No Posts to Show!</Text>
                 </View>
-            }
+            } */}
 
         </View>
 

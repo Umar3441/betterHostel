@@ -10,7 +10,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import numbro from 'numbro';
 import Carousel from 'react-native-snap-carousel';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { colors } from '../utils'
+import { colors, images } from '../utils'
 import auth from '@react-native-firebase/auth'
 import firestore from '@react-native-firebase/firestore'
 
@@ -253,8 +253,11 @@ export default function Post({ post }) {
             {/* <StatusBar translucent barStyle={statusBarContent} backgroundColor='transparent' /> */}
             <View style={styles.postHeaderContainer}>
                 <View style={{ flexDirection: 'row' }}>
-                    <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden' }} >
-                        <Image source={{ uri: 'https://source.unsplash.com/1024x768/?man' }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                    <TouchableOpacity style={{ width: 41, height: 41, justifyContent: 'center', alignSelf: 'center', borderRadius: 20, borderWidth: 1, borderColor: colors.primary, overflow: 'hidden' }} >
+                        {post.profile_picture ?
+                            <Image source={{ uri: post.profile_picture }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                            : <Image source={images.dummyProfile} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                        }
                     </TouchableOpacity>
                     <View style={styles.nameContainer}>
                         <Text style={styles.nameText}>

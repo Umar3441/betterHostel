@@ -7,7 +7,7 @@ import Post from '../../components/post'
 // import { posts } from '../../data/posts'
 import { Viewport } from '@skele/components'
 import firestore from '@react-native-firebase/firestore'
-
+import { images } from '../../utils'
 import { useSelector, useDispatch } from 'react-redux'
 import { addPosts } from '../../redux/actions'
 

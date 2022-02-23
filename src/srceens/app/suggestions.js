@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { TouchableOpacity, StyleSheet, FlatList, Text, View, StatusBar, ScrollView } from 'react-native'
 import auth from '@react-native-firebase/auth'
-import { colors } from '../../utils'
+import { colors, images } from '../../utils'
 import Image from 'react-native-fast-image'
 import Suggestion from '../../components/suggestion'
 import firestore from '@react-native-firebase/firestore'
 import { useSelector } from 'react-redux'
+
 
 
 export default function Suggestions({ navigation }) {
