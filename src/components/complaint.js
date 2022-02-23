@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, Dimensions, StatusBar, KeyboardAvoidingView, TextInput, ScrollView, Keyboard } from 'react-native'
 
 import Image from 'react-native-fast-image'
-import Entypo from 'react-native-vector-icons/Entypo'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import ReadMore from 'react-native-read-more-text';
 import VideoPlayer from 'react-native-video-player';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -23,7 +23,7 @@ import Modal from 'react-native-modal';
 
 const ViewportAwareVideo = Viewport.Aware(VideoPlayer)
 
-export default function Post({ post }) {
+export default function Complaint({ post }) {
 
 
     // console.log('====>>>>>>>>>>', post)
@@ -34,21 +34,26 @@ export default function Post({ post }) {
     mediaRefs.current = []
     const userId = auth().currentUser.uid;
     const postId = post.id;
-    const [commentText, setCommentText] = useState();
-    const [showCommentsModal, setShowCommentsModal] = useState(false);
 
-    const commentsScrollViewRef = useRef(null)
 
 
     const [media, setMedia] = useState([])
-    const [liked, setLiked] = useState(false);
 
 
-    const [statusBarContent, setstatusBarContent] = useState('dark-content');
+    const [voted, setVoted] = useState(false)
+    const [upVoted, setupVoted] = useState(false)
+    const [downVoted, setDownVoted] = useState(false)
+
+    const [upVotesCount, setUpVotesCount] = useState(0)
+    const [downVotesCount, setDownVotesCount] = useState(0)
 
 
 
-    const comments = post.comments
+
+
+
+
+
 
     useEffect(() => {
         setMedia(post?.media?.map((content) => {
@@ -57,80 +62,75 @@ export default function Post({ post }) {
                 loading: false
             }
         }))
-
-        checkLiked()
     }, [post]);
 
 
 
-    const checkLiked = () => {
-        let liked = false;
-        post?.likes?.map(like => {
-            if (like === userId) {
-                liked = true
+    useEffect(() => {
 
+        let upVotesCount = 0
+        let downVotesCount = 0
+        for (let index = 0; index < post?.votes?.length; index++) {
+            const element = post.votes[index];
+
+            if (element.voted === 'up') {
+                upVotesCount++
             }
-        })
-        setLiked(liked)
-    }
+            if (element.voted === 'down') {
+                downVotesCount++
+            }
 
 
-    const like = () => {
-        // console.log('liking', postId, '--->', userId)
+            if (element.id === auth().currentUser.uid) {
+
+                setVoted(true)
+
+                if (element.voted === 'up') {
+                    setupVoted(true)
 
 
-        if (!liked) {
-            firestore().collection('posts').doc(postId).update(
-                {
-                    likes: [...post.likes, userId],
                 }
-            )
-        } else {
-            const likes = post.likes.filter(like => like !== userId)
+                if (element.voted === 'down') {
+                    setDownVoted(true)
 
-            // console.log('------>', likes)
-
-            firestore().collection('posts').doc(postId).update(
-                {
-                    likes: likes,
                 }
-            )
+            }
+
         }
-    }
 
 
-    const addComment = () => {
+        setUpVotesCount(upVotesCount)
+        setDownVotesCount(downVotesCount)
+
+    }, [post])
 
 
-        if (!commentText) {
+    const vote = (vote) => {
+
+        if (voted) {
             return
         }
 
-
-        firestore().collection('posts').doc(postId).update(
-            {
-                comments: [
-                    ...post.comments
-                    ,
-                    {
-                        userId: auth()?.currentUser?.uid,
-                        userName: auth()?.currentUser?.displayName,
-                        userAvatar: auth().currentUser.photoURL,
-                        comment: commentText,
-                        timeStamp: moment().toISOString(),
-                    }
-                ]
-            }
-        ).then(
-            () => {
-
-                // Keyboard.dismiss()
-                commentsScrollViewRef.current.scrollToEnd()
-                setCommentText(null)
-            }
-        )
-
+        firestore().collection('complaints')
+            .doc(post.id)
+            .update(
+                {
+                    votes: [...post.votes, {
+                        id: auth().currentUser.uid,
+                        voted: vote
+                    }]
+                }
+            )
+            .then(
+                () => console.log('voted')
+            ).catch(
+                (error) => console.log(error)
+            )
     }
+
+
+
+
 
 
     const fromDate = () => {
@@ -252,19 +252,31 @@ export default function Post({ post }) {
         <View style={[styles.container,]}>
             {/* <StatusBar translucent barStyle={statusBarContent} backgroundColor='transparent' /> */}
             <View style={styles.postHeaderContainer}>
-                <View style={{ flexDirection: 'row' }}>
-                    <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden' }} >
-                        <Image source={{ uri: 'https://source.unsplash.com/1024x768/?man' }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                {!post.isAnonymous ?
+                    <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 1, borderColor: colors.primary, overflow: 'hidden' }} >
+                        <Image source={{ uri: post.profile_picture }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
                     </TouchableOpacity>
-                    <View style={styles.nameContainer}>
-                        <Text style={styles.nameText}>
-                            {post.userName}
-                        </Text>
-                        <Text style={styles.emailText}>
-                            {post.userEmail}
-                        </Text>
+                    :
+                    <View style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 25, borderWidth: 0, overflow: 'hidden' }} >
+                        <MaterialCommunityIcons name='guy-fawkes-mask' size={35} />
                     </View>
-                </View>
+                }
+                {!post.isAnonymous ? <View style={styles.nameContainer}>
+                    <Text style={styles.nameText}>
+                        {post.userName}
+                    </Text>
+                    <Text style={styles.emailText}>
+                        {post.userEmail}
+                    </Text>
+                </View> :
+                    <View style={[styles.nameContainer, { justifyContent: 'center' }]}>
+                        <Text style={styles.nameText}>
+                            Anonymous
+                        </Text>
+
+                    </View>
+
+                }
                 {/* <Entypo name='dots-three-horizontal' size={30} color={colors.grey} onPress={() => console.log('we are three dots in post header', snapCarouselRef.current.currentIndex)} /> */}
             </View>
             <View style={styles.titleContainer}>
@@ -313,93 +325,30 @@ export default function Post({ post }) {
 
             <View style={styles.reactionContainer}>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-                    {liked ?
-                        <MaterialCommunityIcons name='heart' size={25} color={colors.red} onPress={() => like()} />
-                        : <MaterialCommunityIcons name='heart-outline' size={25} color={colors.grey} onPress={() => like()} />}
-                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{post?.likes?.length}</Text>
+                    <AntDesign name='like1' size={25} color={upVoted ? colors.primary : colors.grey} onPress={() => vote('up')} />
+                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{upVotesCount}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 20 }}>
-                    <MaterialCommunityIcons name='comment-outline' size={22} color={colors.grey} onPress={() => setShowCommentsModal(true)} />
-                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{post?.comments?.length}</Text>
+                    <AntDesign name='dislike1' size={25} color={downVoted ? colors.primary : colors.grey} onPress={() => vote('down')} />
+                    <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{downVotesCount}</Text>
                 </View>
             </View>
 
-            <View style={{ marginHorizontal: 20 }}>
+
+            <View style={{ marginHorizontal: 20, marginTop: 10 }}>
                 <Text style={{ marginHorizontal: 5, color: colors.grey, fontWeight: '500' }}>{fromDate()}</Text>
             </View>
 
-            <Modal
-                animationType={"slide"}
-                visible={showCommentsModal}
-                style={styles.commentsModal}
-
-            >
-
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={styles.commentsContainer}>
-
-                    <MaterialCommunityIcons name='close' color={colors.primary} size={30} onPress={() => setShowCommentsModal(false)} style={{ position: 'absolute', top: 10, right: 20 }} />
-
-                    <View style={{ width: 30, height: 10, backgroundColor: colors.primary, alignSelf: 'center', borderRadius: 20 }} />
-
-                    <Text style={{ fontSize: 22, fontWeight: 'bold', alignSelf: 'center', color: colors.black, marginVertical: 5 }}>Comments</Text>
-
-                    {comments.length > 0 ? <ScrollView
-
-                        ref={commentsScrollViewRef}
-                        showsVerticalScrollIndicator={false}>
-
-
-                        {
-                            comments.map((comment, index) => <CommentBody key={index} comment={comment} />)
-                        }
-                    </ScrollView> :
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ color: colors.grey, fontSize: 18 }}>Be first to Comment</Text>
-                        </View>
-                    }
-                    <View style={styles.commentInput}>
-                        <TextInput placeholder='Comment' value={commentText} onChangeText={(text) => setCommentText(text)} multiline={true} style={{ backgroundColor: colors.lightGrey, flex: 7, padding: 10, paddingTop: 10, borderRadius: 10, alignItems: 'center' }} />
-                        <View style={{ flex: 1, marginHorizontal: 5 }}>
-                            <FontAwesome name='send' size={30} color={colors.primary} onPress={() => addComment()} />
-                        </View>
-
-
-                    </View>
-                </KeyboardAvoidingView>
-
-            </Modal>
-
-        </View>
+        </View >
     )
 }
 
 
 
-const CommentBody = ({ comment }) => {
-    return (
-        <View style={styles.commentContentContainer}>
 
-            <View style={styles.userAvatar}>
-                <Image source={{ uri: comment.userAvatar }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
-            </View>
-
-            <View style={{ flexDirection: 'row', width: '90%', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 5 }}>
-                <Text style={{ color: colors.grey, fontWeight: 'bold', fontSize: 18 }}>{comment.userName}</Text>
-                <Text style={{ color: colors.grey }}>{moment(comment.timeStamp).fromNow(true)}</Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', width: '90%', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 5, marginTop: 10 }}>
-                <Text style={{ textAlign: 'justify' }}>{comment.comment} </Text>
-            </View>
-
-        </View>
-    )
-}
 
 const styles = StyleSheet.create({
     container: {
@@ -407,12 +356,14 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         backgroundColor: colors.white,
         borderRadius: 20,
+
+
     },
     postHeaderContainer: {
         width: '100%',
         backgroundColor: 'white',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
         alignItems: 'center',
         padding: 10
     },
@@ -435,6 +386,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         backgroundColor: colors.white,
         paddingHorizontal: 10
+
     },
     titleText: {
         fontSize: 15,
@@ -447,7 +399,8 @@ const styles = StyleSheet.create({
         // borderRadius: 20,
         overflow: 'hidden',
         alignItems: 'center',
-        marginBottom: 2
+        marginBottom: 2,
+        // backgroundColor: 'red'
 
     },
     indexContainer:

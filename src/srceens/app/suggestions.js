@@ -63,7 +63,7 @@ export default function Suggestions() {
                 data={suggestions}
                 ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
                 renderItem={({ item, index }) =>
-                    <View style={{ marginBottom: index === suggestions.length - 1 ? 300 : 0 }}>
+                    <View style={{ marginBottom: index === suggestions.length - 1 ? 300 : 0, width: '100%' }}>
                         <Suggestion suggestion={item} />
                     </View>
                 }
@@ -120,7 +120,8 @@ const styles = StyleSheet.create({
     flatListStyles: {
 
         paddingTop: 20,
-        zIndex: -5
+        zIndex: -5,
+
 
 
     },

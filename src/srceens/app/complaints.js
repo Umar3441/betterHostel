@@ -1,11 +1,109 @@
-import React from 'react'
-import { TouchableOpacity, StyleSheet, Text, View, StatusBar } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { Button, StyleSheet, Text, View, StatusBar, TouchableOpacity, FlatList } from 'react-native'
+import Image from 'react-native-fast-image'
 import auth from '@react-native-firebase/auth'
 import { colors } from '../../utils'
-import Image from 'react-native-fast-image'
+import Complaint from '../../components/complaint'
+// import { posts } from '../../data/posts'
+import { Viewport } from '@skele/components'
+import firestore from '@react-native-firebase/firestore'
+
+import { useSelector, useDispatch } from 'react-redux'
+import { addPosts } from '../../redux/actions'
+
+
+
+
 
 
 export default function Complaints() {
+
+
+    // const [postsData, setPostsData] = useState(posts)
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const dispatch = useDispatch()
+
+    const user = useSelector(state => state.reducer.user)
+    // const posts = useSelector(state => state.reducer.posts)
+
+    const [posts, setposts] = useState([]);
+
+    // console.log('??????', posts)
+
+
+
+
+    // useEffect(() => {
+    //     const subscribe = firestore()
+    //         .collection('posts')
+    //         .orderBy('timeStamp', "desc")
+    //         .onSnapshot((querySnapshot) => {
+
+    //             const postsTemp = []
+    //             querySnapshot.forEach(function (doc) {
+    //                 console.log("snapshot added ", doc)
+    //                 postsTemp.push(doc.data())
+    //             });
+    //             dispatch(addPosts(postsTemp))
+    //         }
+    //         )
+
+    //     return subscribe
+
+    // }
+
+    //     , [])
+
+
+
+    useEffect(() => {
+        const subscribe = firestore()
+            .collection('complaints')
+            .orderBy('timeStamp', "desc")
+            .onSnapshot((querySnapshot) => {
+                const postsTemp = []
+                setposts(querySnapshot.docs.map(function (doc) {
+                    return { id: doc.id, ...doc.data() }
+                    // postsTemp.push(doc.data())
+                }))
+
+                // dispatch(addPosts(postsTemp))
+            }
+            )
+
+        return subscribe
+
+    }
+
+        , [])
+
+
+
+
+    // useEffect(() => {
+    //     // const subscribe =
+    //     firestore()
+    //         .collection('posts')
+    //         .orderBy('timeStamp', "desc")
+    //         .get().then(
+    //             (querySnapshot) => {
+
+    //                 const postsTemp = []
+    //                 querySnapshot.forEach(function (doc) {
+    //                     console.log("snapshot added ", doc)
+    //                     postsTemp.push(doc.data())
+    //                 });
+    //                 dispatch(addPosts(postsTemp))
+    //             }
+    //         )
+
+    //     // return subscribe
+
+    // }, [])
+
+
+
+
 
 
 
@@ -15,7 +113,7 @@ export default function Complaints() {
             <View style={[styles.headerContainer]}>
 
                 <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginTop: 30 }}>
-                    Complaints
+                    Home
                 </Text>
                 <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, position: 'absolute', top: '45%', right: '4%', borderWidth: 2, borderColor: colors.white, overflow: 'hidden' }} >
                     <Image source={{ uri: 'https://source.unsplash.com/1024x768/?person' }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
@@ -31,8 +129,30 @@ export default function Complaints() {
             <StatusBar translucent barStyle='light-content' backgroundColor='transparent' />
             <Header />
 
+            {posts.length > 0 ? <Viewport.Tracker style={{
+                zIndex: -1,
+            }}>
+                <FlatList
 
-
+                    // onViewableItemsChanged={onViewableItemsChanged.current}
+                    // viewabilityConfig={
+                    //     viewabilityConfig.current
+                    // }
+                    style={styles.flatListStyles}
+                    data={posts}
+                    ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
+                    renderItem={({ item, index }) =>
+                        <View style={{ marginBottom: index === posts.length - 1 ? 300 : 0 }}>
+                            <Complaint post={item} />
+                        </View>
+                    }
+                    showsVerticalScrollIndicator={false}
+                />
+            </Viewport.Tracker> :
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ color: colors.grey, fontSize: 18 }}>No Complaints to Show!</Text>
+                </View>
+            }
 
         </View>
     )
@@ -82,4 +202,18 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 10
 
     },
+    flatListStyles: {
+
+        paddingTop: 20,
+        zIndex: -5
+
+
+    },
+    itemSeperator: {
+        width: '90%',
+        height: 0.5,
+        backgroundColor: colors.grey,
+        alignSelf: 'center',
+        marginVertical: 10
+    }
 })

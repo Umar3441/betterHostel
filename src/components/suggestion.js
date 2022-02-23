@@ -131,7 +131,7 @@ const Suggestion = ({ suggestion }) => {
 
             <View style={styles.titleContainer}>
 
-                <View style={{ marginRight: 10 }}>
+                <View style={{ marginRight: 5 }}>
                     <View style={{ alignItems: 'center', marginBottom: 30 }}>
                         <AntDesign name='caretup' size={30} color={upVoted ? colors.primary : colors.grey} onPress={() => vote('up')} />
                         <Text style={{ color: colors.grey }}>{upVotesCount}</Text>
@@ -143,14 +143,16 @@ const Suggestion = ({ suggestion }) => {
                     </View>
                 </View>
 
-                <ReadMore
+                <View style={{ flex: 1 }}>
+                    <ReadMore
 
-                    numberOfLines={2}
-                    renderTruncatedFooter={(handlePress) => { return <Text onPress={handlePress} style={{ color: 'grey' }}>show more</Text> }}
-                    renderRevealedFooter={(handlePress) => { return <Text onPress={handlePress} style={{ color: 'grey' }}>show less</Text> }}
-                >
-                    <Text style={styles.titleText}>{suggestion.suggestion}</Text>
-                </ReadMore>
+                        numberOfLines={2}
+                        renderTruncatedFooter={(handlePress) => { return <Text onPress={handlePress} style={{ color: 'grey' }}>show more</Text> }}
+                        renderRevealedFooter={(handlePress) => { return <Text onPress={handlePress} style={{ color: 'grey' }}>show less</Text> }}
+                    >
+                        <Text style={styles.titleText}>{suggestion.suggestion}</Text>
+                    </ReadMore>
+                </View>
 
             </View>
         </View >
@@ -189,15 +191,19 @@ const styles = StyleSheet.create({
 
     },
     titleContainer: {
-        width: '100%',
+        // width: '100%',
         marginVertical: 5,
         backgroundColor: colors.white,
         paddingHorizontal: 10,
         flexDirection: 'row',
+        // backgroundColor: 'red',
+        // marginHorizontal: 10
     },
     titleText: {
         fontSize: 15,
         color: colors.lightBlack,
-        lineHeight: 18
+        lineHeight: 18,
+        textAlign: 'left',
+
     },
 });

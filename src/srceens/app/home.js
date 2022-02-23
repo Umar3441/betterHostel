@@ -67,7 +67,7 @@ export default function Home() {
                     // postsTemp.push(doc.data())
                 }))
 
-                // dispatch(addPosts(postsTemp))
+                dispatch(addPosts(postsTemp))
             }
             )
 
@@ -125,32 +125,41 @@ export default function Home() {
     }
 
     return (
+
+
         <View style={{ flex: 1, backgroundColor: colors.white }}>
             <StatusBar translucent barStyle='light-content' backgroundColor='transparent' />
             <Header />
 
-            <Viewport.Tracker style={{
-                zIndex: -1,
-            }}>
-                <FlatList
+            {posts.length > 0 ?
+                <Viewport.Tracker style={{
+                    zIndex: -1,
+                }}>
+                    <FlatList
 
-                    // onViewableItemsChanged={onViewableItemsChanged.current}
-                    // viewabilityConfig={
-                    //     viewabilityConfig.current
-                    // }
-                    style={styles.flatListStyles}
-                    data={posts}
-                    ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
-                    renderItem={({ item, index }) =>
-                        <View style={{ marginBottom: index === posts.length - 1 ? 300 : 0 }}>
-                            <Post post={item} />
-                        </View>
-                    }
-                    showsVerticalScrollIndicator={false}
-                />
-            </Viewport.Tracker>
+                        // onViewableItemsChanged={onViewableItemsChanged.current}
+                        // viewabilityConfig={
+                        //     viewabilityConfig.current
+                        // }
+                        style={styles.flatListStyles}
+                        data={posts}
+                        ItemSeparatorComponent={() => <View style={styles.itemSeperator} />}
+                        renderItem={({ item, index }) =>
+                            <View style={{ marginBottom: index === posts.length - 1 ? 300 : 0 }}>
+                                <Post post={item} />
+                            </View>
+                        }
+                        showsVerticalScrollIndicator={false}
+                    />
+                </Viewport.Tracker>
+                :
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ color: colors.grey, fontSize: 18 }}>No Posts to Show!</Text>
+                </View>
+            }
 
         </View>
+
     )
 }
 
