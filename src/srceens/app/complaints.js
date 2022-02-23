@@ -16,7 +16,7 @@ import { addPosts } from '../../redux/actions'
 
 
 
-export default function Complaints() {
+export default function Complaints({ navigation }) {
 
 
     // const [postsData, setPostsData] = useState(posts)
@@ -113,10 +113,17 @@ export default function Complaints() {
             <View style={[styles.headerContainer]}>
 
                 <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginTop: 30 }}>
-                    Home
+                    Complaints
                 </Text>
-                <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, position: 'absolute', top: '45%', right: '4%', borderWidth: 2, borderColor: colors.white, overflow: 'hidden' }} >
-                    <Image source={{ uri: 'https://source.unsplash.com/1024x768/?person' }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                <TouchableOpacity onPress={() => navigation.navigate('Account')} style={{ justifyContent: 'center', alignItems: 'center', width: 40, height: 40, borderRadius: 25, position: 'absolute', top: '45%', right: '4%', borderWidth: 2, borderColor: colors.white, overflow: 'hidden' }} >
+                    {
+                        user.photoURL ?
+                            <Image source={{ uri: user.photoURL }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                            :
+                            <Image source={images.dummyProfile} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+
+                    }
+
                 </TouchableOpacity>
                 <View style={styles.subHeader1} />
                 <View style={styles.subHeader2} />

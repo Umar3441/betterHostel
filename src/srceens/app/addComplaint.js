@@ -42,7 +42,7 @@ export default function AddSuggestion() {
         }
     ];
 
-    const posts = useSelector(state => state.reducer.posts)
+    const user = useSelector(state => state.reducer.user)
     const dispatch = useDispatch()
 
 
@@ -124,10 +124,10 @@ export default function AddSuggestion() {
                                     .add({
                                         caption: title,
                                         media: postImages,
-                                        user: auth().currentUser.uid,
-                                        userName: auth().currentUser.displayName,
-                                        profile_picture: auth().currentUser.photoURL,
-                                        userEmail: auth().currentUser.email,
+                                        user: user.uid,
+                                        userName: user.displayName,
+                                        profile_picture: user.photoURL,
+                                        userEmail: user.email,
                                         timeStamp: moment().toISOString(),
                                         votes: [],
                                         isAnonymous: isAnonymous
@@ -139,10 +139,10 @@ export default function AddSuggestion() {
                                         //     {
                                         //         caption: title,
                                         //         media: postImages,
-                                        //         user: auth().currentUser.uid,
-                                        //         userName: auth().currentUser.displayName,
-                                        //         profile_picture: auth().currentUser.photoURL,
-                                        //         userEmail: auth().currentUser.email,
+                                        //         user: user.uid,
+                                        //         userName: user.displayName,
+                                        //         profile_picture: user.photoURL,
+                                        //         userEmail: user.email,
                                         //         comments: [],
                                         //         timeStamp: moment().toISOString(),
                                         //         likes: 0
@@ -152,10 +152,10 @@ export default function AddSuggestion() {
                                         // // tempPosts.push({
                                         // //     caption: title,
                                         // //     media: postImages,
-                                        // //     user: auth().currentUser.uid,
-                                        // //     userName: auth().currentUser.displayName,
-                                        // //     profile_picture: auth().currentUser.photoURL,
-                                        // //     userEmail: auth().currentUser.email,
+                                        // //     user: user.uid,
+                                        // //     userName: user.displayName,
+                                        // //     profile_picture: user.photoURL,
+                                        // //     userEmail: user.email,
                                         // //     comments: [],
                                         // //     timeStamp: moment().toISOString(),
                                         // //     likes: 0
@@ -189,10 +189,10 @@ export default function AddSuggestion() {
                     .add({
                         caption: title,
                         media: postImages,
-                        user: auth().currentUser.uid,
-                        userName: auth().currentUser.displayName,
-                        profile_picture: auth().currentUser.photoURL,
-                        userEmail: auth().currentUser.email,
+                        user: user.uid,
+                        userName: user.displayName,
+                        profile_picture: user.photoURL,
+                        userEmail: user.email,
                         timeStamp: moment().toISOString(),
                         votes: [],
                         isAnonymous: isAnonymous

@@ -61,7 +61,7 @@ export default function Account() {
                 </Text>
                 <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', width: 40, height: 40, borderRadius: 25, position: 'absolute', top: '45%', right: '4%', borderWidth: 2, borderColor: colors.white, overflow: 'hidden' }} >
                     {
-                        auth().currentUser.photoURL ?
+                        user.photoURL ?
                             <Image source={{ uri: user.photoURL }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
                             :
                             <Image source={images.dummyProfile} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />

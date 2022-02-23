@@ -11,6 +11,7 @@ import * as Progress from 'react-native-progress';
 import moment from 'moment';
 import RadioButtonRN from 'radio-buttons-react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useSelector } from 'react-redux';
 
 const AddSuggestion = () => {
 
@@ -19,6 +20,7 @@ const AddSuggestion = () => {
     const [loading, setLoading] = useState(false)
     const navigation = useNavigation()
     const [isAnonymous, setIsAnonymous] = useState(false)
+    const user = useSelector(state => state.reducer.user)
 
     const idData = [
         {
@@ -51,10 +53,10 @@ const AddSuggestion = () => {
             .add({
                 isAnonymous: isAnonymous,
                 suggestion: suggestion,
-                user: auth().currentUser.uid,
-                userName: auth().currentUser.displayName,
-                profile_picture: auth().currentUser.photoURL,
-                userEmail: auth().currentUser.email,
+                user: user.uid,
+                userName: user.displayName,
+                profile_picture: user.photoURL,
+                userEmail: user.email,
                 timeStamp: moment().toISOString(),
                 votes: []
             })
