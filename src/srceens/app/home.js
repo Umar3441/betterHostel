@@ -24,35 +24,16 @@ export default function Home() {
     const dispatch = useDispatch()
 
     const user = useSelector(state => state.reducer.user)
-    // const posts = useSelector(state => state.reducer.posts)
+    console.log('user in home', user)
+    const posts = useSelector(state => state.reducer.posts)
 
-    const [posts, setposts] = useState([]);
+
+
+    // const [posts, setposts] = useState([]);
 
     // console.log('??????', posts)
 
 
-
-
-    // useEffect(() => {
-    //     const subscribe = firestore()
-    //         .collection('posts')
-    //         .orderBy('timeStamp', "desc")
-    //         .onSnapshot((querySnapshot) => {
-
-    //             const postsTemp = []
-    //             querySnapshot.forEach(function (doc) {
-    //                 console.log("snapshot added ", doc)
-    //                 postsTemp.push(doc.data())
-    //             });
-    //             dispatch(addPosts(postsTemp))
-    //         }
-    //         )
-
-    //     return subscribe
-
-    // }
-
-    //     , [])
 
 
 
@@ -61,12 +42,12 @@ export default function Home() {
             .collection('posts')
             .orderBy('timeStamp', "desc")
             .onSnapshot((querySnapshot) => {
-                const postsTemp = []
-                setposts(querySnapshot.docs.map(function (doc) {
-                    return { id: doc.id, ...doc.data() }
-                    // postsTemp.push(doc.data())
-                }))
 
+                const postsTemp = []
+                querySnapshot.forEach(function (doc) {
+                    // console.log("snapshot added ", doc)
+                    postsTemp.push({ id: doc.id, ...doc.data() })
+                });
                 dispatch(addPosts(postsTemp))
             }
             )
@@ -76,6 +57,29 @@ export default function Home() {
     }
 
         , [])
+
+
+
+    // useEffect(() => {
+    //     const subscribe = firestore()
+    //         .collection('posts')
+    //         .orderBy('timeStamp', "desc")
+    //         .onSnapshot((querySnapshot) => {
+    //             const postsTemp = []
+    //             setposts(querySnapshot.docs.map(function (doc) {
+    //                 return { id: doc.id, ...doc.data() }
+    //                 // postsTemp.push(doc.data())
+    //             }))
+
+    //             dispatch(addPosts(postsTemp))
+    //         }
+    //         )
+
+    //     return subscribe
+
+    // }
+
+    //     , [])
 
 
 

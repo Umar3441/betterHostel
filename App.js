@@ -5,14 +5,18 @@ import Home from './src/srceens/app/home';
 import TabNavigator from './src/navigation/tabNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/appNavigator';
+import { useDispatch, useSelector } from 'react-redux';
+import { addUser } from './src/redux/actions';
 
 export default function App() {
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const user = useSelector(state => state.reducer.user)
+  const dispatch = useDispatch();
 
 
   function onAuthStateChanged(user) {
-    setUser(user);
+    // setUser(user);
+    dispatch(addUser(user))
     if (initializing) setInitializing(false);
   }
 
