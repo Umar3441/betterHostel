@@ -1255,6 +1255,16 @@
   resolved "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-14.2.2.tgz"
   integrity sha512-oXY9NDLqKF36Kbi2UgZVbyacVCsRCj3ODOkqA6A1E99CdamEKVNB5AfS3Qa+cuJ1nepay8/ELNy87Gr5fMk3AA==
 
+"@react-native-firebase/functions@^14.5.0":
+  version "14.5.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/functions/-/functions-14.5.0.tgz#67438bb2e3eab32f9b69539e996b414a89d6a4cf"
+  integrity sha512-bXHQBGKpflxok7IcD9RzFw+xQGaOG6XJ1kmenBmNDB9cM+oMP9NPIqCQ5p5dzeNlphYbEeEPy6H4LaUmlwQWuQ==
+
+"@react-native-firebase/messaging@^14.5.0":
+  version "14.5.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-14.5.0.tgz#ae4d2c8ef6432f6bbd541015817343e8703504ea"
+  integrity sha512-kLA5lx0xoHwMo1fPQWE5IzIKOrmmSYRAfxKQqCETEmCEv/TSa/siiKAWvB8BzSvNUJeZkFFWwv77MxfArtZsyg==
+
 "@react-native-firebase/storage@^14.2.2":
   version "14.2.2"
   resolved "https://registry.npmjs.org/@react-native-firebase/storage/-/storage-14.2.2.tgz"

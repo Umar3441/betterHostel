@@ -59,7 +59,7 @@ export default function Account() {
                 <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginTop: 30 }}>
                     Profile
                 </Text>
-                <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', width: 40, height: 40, borderRadius: 25, position: 'absolute', top: '45%', right: '4%', borderWidth: 2, borderColor: colors.white, overflow: 'hidden' }} >
+                <TouchableOpacity onPress={() => auth().signOut()} style={{ justifyContent: 'center', alignItems: 'center', width: 40, height: 40, borderRadius: 25, position: 'absolute', top: '45%', right: '4%', borderWidth: 2, borderColor: colors.white, overflow: 'hidden' }} >
                     {
                         user.photoURL ?
                             <Image source={{ uri: user.photoURL }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
@@ -99,7 +99,7 @@ export default function Account() {
                         </View>
                     }
                     showsVerticalScrollIndicator={false}
-                    ListHeaderComponent={() => <ProfileHeader />}
+                    ListHeaderComponent={() => <ProfileHeader post={allPosts[0]} />}
                 />
             </Viewport.Tracker>
             {/* :

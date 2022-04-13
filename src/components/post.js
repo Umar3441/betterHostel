@@ -42,6 +42,7 @@ export default function Post({ post }) {
 
     const [media, setMedia] = useState([])
     const [liked, setLiked] = useState(false);
+    const [profilePic, setProfilePic] = useState(null)
 
 
     const [statusBarContent, setstatusBarContent] = useState('dark-content');
@@ -60,6 +61,14 @@ export default function Post({ post }) {
 
         checkLiked()
     }, [post]);
+
+
+    useEffect(() => {
+        firestore().collection('users').doc(post.user)
+            .get().then(
+                (doc) => setProfilePic(doc.data()?.photoURL)
+            )
+    }, [post])
 
 
 
@@ -254,8 +263,8 @@ export default function Post({ post }) {
             <View style={styles.postHeaderContainer}>
                 <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity style={{ width: 41, height: 41, justifyContent: 'center', alignSelf: 'center', borderRadius: 20, borderWidth: 1, borderColor: colors.primary, overflow: 'hidden' }} >
-                        {post.profile_picture ?
-                            <Image source={{ uri: post.profile_picture }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                        {profilePic ?
+                            <Image source={{ uri: profilePic }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
                             : <Image source={images.dummyProfile} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
                         }
                     </TouchableOpacity>

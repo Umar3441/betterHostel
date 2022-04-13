@@ -4,8 +4,10 @@ import CustomButton from '../../components/customButton'
 import CustomTextInput from '../../components/customTextInput'
 import { colors } from '../../utils'
 
+
 import { useNavigation } from '@react-navigation/native'
 import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
 
 
 
@@ -143,21 +145,40 @@ export default function Signup() {
     }
 
 
+    // user.updateProfile(
+    //     {
+    //         displayName: firstName + " " + lastName
+    //     }
+    // ).then(() => {
+    //     // setLoading(false)
+    // }
+
+    // )
+
 
     const signup = () => {
         setLoading(true)
         if (ValidateForm()) {
+
             auth().createUserWithEmailAndPassword(email, password)
                 .then(({ user }) => {
-                    user.updateProfile(
-                        {
-                            displayName: firstName + " " + lastName
-                        }
-                    ).then(() => {
-                        // setLoading(false)
-                    }
 
-                    )
+                    firestore()
+                        .collection('users').doc(user.uid)
+                        .set({
+                            displayName: firstName + " " + lastName,
+                            email: email,
+                            photoURL: null
+
+                        })
+                        .then(() => {
+                            console.log('User added!');
+                        }).catch(
+                            (err) => console.log(err)
+                        )
+
+
+
                 }).catch(
                     error => {
                         setConfirmPasswordError(error.message.split(']')[1])

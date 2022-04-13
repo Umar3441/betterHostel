@@ -9,7 +9,7 @@ import { Viewport } from '@skele/components'
 import firestore from '@react-native-firebase/firestore'
 import { images } from '../../utils'
 import { useSelector, useDispatch } from 'react-redux'
-import { addPosts } from '../../redux/actions'
+import { addPosts, addUser } from '../../redux/actions'
 
 
 
@@ -59,6 +59,20 @@ export default function Home({ navigation }) {
     }
 
         , [])
+
+
+
+    useEffect(() => {
+        const subscribe = firestore()
+            .collection('users')
+            .doc(auth().currentUser.uid)
+            .onSnapshot((querySnapshot) => {
+                dispatch(addUser({ uid: querySnapshot.id, ...querySnapshot.data() }))
+            }
+            )
+        return subscribe
+    }, [])
+
 
 
 
@@ -123,7 +137,7 @@ export default function Home({ navigation }) {
                 </Text>
                 <TouchableOpacity onPress={() => navigation.navigate('Account')} style={{ justifyContent: 'center', alignItems: 'center', width: 40, height: 40, borderRadius: 25, position: 'absolute', top: '45%', right: '4%', borderWidth: 2, borderColor: colors.white, overflow: 'hidden' }} >
                     {
-                        user.photoURL ?
+                        user?.photoURL ?
                             <Image source={{ uri: user.photoURL }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
                             :
                             <Image source={images.dummyProfile} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />

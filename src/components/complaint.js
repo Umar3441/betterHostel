@@ -10,7 +10,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import numbro from 'numbro';
 import Carousel from 'react-native-snap-carousel';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { colors } from '../utils'
+import { colors, images } from '../utils'
 import auth from '@react-native-firebase/auth'
 import firestore from '@react-native-firebase/firestore'
 
@@ -47,8 +47,16 @@ export default function Complaint({ post }) {
     const [upVotesCount, setUpVotesCount] = useState(0)
     const [downVotesCount, setDownVotesCount] = useState(0)
 
+    const [profilePic, setProfilePic] = useState(null)
 
 
+
+    useEffect(() => {
+        firestore().collection('users').doc(post.user)
+            .get().then(
+                (doc) => setProfilePic(doc.data()?.photoURL)
+            )
+    }, [post])
 
 
 
@@ -254,7 +262,10 @@ export default function Complaint({ post }) {
             <View style={styles.postHeaderContainer}>
                 {!post.isAnonymous ?
                     <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 1, borderColor: colors.primary, overflow: 'hidden' }} >
-                        <Image source={{ uri: post.profile_picture }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                        {profilePic ?
+                            <Image source={{ uri: profilePic }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                            : <Image source={images.dummyProfile} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                        }
                     </TouchableOpacity>
                     :
                     <View style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 25, borderWidth: 0, overflow: 'hidden' }} >

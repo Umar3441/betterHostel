@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { colors } from '../utils';
+import { colors, images } from '../utils';
 import Image from 'react-native-fast-image'
 import ReadMore from 'react-native-read-more-text';
 import AntDesign from 'react-native-vector-icons/AntDesign'
@@ -18,8 +18,15 @@ const Suggestion = ({ suggestion }) => {
 
     const [upVotesCount, setUpVotesCount] = useState(0)
     const [downVotesCount, setDownVotesCount] = useState(0)
+    const [profilePic, setProfilePic] = useState(null)
 
 
+    useEffect(() => {
+        firestore().collection('users').doc(suggestion.user)
+            .get().then(
+                (doc) => setProfilePic(doc.data()?.photoURL)
+            )
+    }, [suggestion])
 
 
 
@@ -102,7 +109,10 @@ const Suggestion = ({ suggestion }) => {
 
                     {!suggestion.isAnonymous ?
                         <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 25, borderWidth: 1, borderColor: colors.primary, overflow: 'hidden' }} >
-                            <Image source={{ uri: suggestion.profile_picture }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                            {profilePic ?
+                                <Image source={{ uri: profilePic }} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                                : <Image source={images.dummyProfile} style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' />
+                            }
                         </TouchableOpacity>
                         :
                         <View style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 25, borderWidth: 0, overflow: 'hidden' }} >

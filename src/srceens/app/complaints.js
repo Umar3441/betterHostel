@@ -33,6 +33,7 @@ export default function Complaints({ navigation }) {
 
 
 
+
     // useEffect(() => {
     //     const subscribe = firestore()
     //         .collection('posts')

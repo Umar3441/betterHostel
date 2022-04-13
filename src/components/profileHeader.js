@@ -8,15 +8,18 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import { addUser } from '../redux/actions'
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore'
 
 
-const ProfileHeader = () => {
+const ProfileHeader = ({ post }) => {
 
 
     const user = useSelector(state => state.reducer.user)
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false)
 
+
+    const [random, setrandom] = useState(Math.floor(Math.random() * 10));
 
 
     const updateProfile = () => {
@@ -35,18 +38,41 @@ const ProfileHeader = () => {
             task.then(
                 async () => {
                     const url = await reference.getDownloadURL().catch((error) => { console.log('---', error) });
-                    auth().currentUser.updateProfile(
-                        {
+
+                    firestore()
+                        .collection('users')
+                        .doc(auth().currentUser.uid)
+                        .update({
                             photoURL: url
-                        }
-                    ).then(
-                        () => auth().currentUser.reload().then(
-                            () => {
-                                setLoading(false);
-                                dispatch(addUser(auth().currentUser))
+                        }).then(
+                            () => console.log('')
+                        ).catch((error) => console.log(error))
+
+
+
+                    firestore()
+                        .collection('posts')
+                        .doc(post?.id)
+                        .update(
+                            {
+                                ...post, displayName: random
                             }
+                        ).then(
+                            () => console.log('')
                         )
-                    )
+
+                    // auth().currentUser.updateProfile(
+                    //     {
+                    //         photoURL: url
+                    //     }
+                    // ).then(
+                    //     () => auth().currentUser.reload().then(
+                    //         () => {
+                    //             setLoading(false);
+                    //             dispatch(addUser(auth().currentUser))
+                    //         }
+                    //     )
+                    // )
                 }
             )
         })
